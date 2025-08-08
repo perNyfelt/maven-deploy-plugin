@@ -21,13 +21,9 @@ package org.apache.maven.plugins.deploy;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.security.DigestOutputStream;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -96,7 +92,7 @@ public class Bundler {
             if (pomFile.exists()) {
                 // Since it is the "raw" pom file that is published, not the effective pom, we must check the file,
                 // not the project. Also since the pom file is the signed one, we cannot change it to the effective pom.
-                validateForPublishing(pomFile);
+                // validateForPublishing(pomFile);
 
                 artifactFiles.get(mavenPathPrefix).add(pomFile);
                 File signFile = new File(pomFile.getAbsolutePath() + ".asc");
@@ -168,6 +164,7 @@ public class Bundler {
      *  <li>SCM URL</li>
      *  <li>Developers information</li>
      * </ul>
+     * Not used now. TODO: must verify with central if a child project can omit this.
      */
     private void validateForPublishing(File pomFile) throws MojoExecutionException {
         Model model = readPomFile(pomFile);
@@ -212,7 +209,6 @@ public class Bundler {
         for (Map.Entry<String, Object> entry : results.entrySet()) {
             String extension = entry.getKey().toLowerCase().replace("-", "");
             File checksumFile = new File(file.getAbsolutePath() + "." + extension);
-            log.info("generateChecksums: " + extension);
             if (!checksumFile.exists()) {
                 Files.write(checksumFile.toPath(), entry.getValue().toString().getBytes(StandardCharsets.UTF_8));
             }
